@@ -13,14 +13,14 @@ var staticDirectory string
 var serverHost string
 var serverPort int
 
-type todo struct {
+type ToDo struct {
 	id int32
 	activity string
 }
 
-type todoWrapper struct {
+type TodoWrapper struct {
 	id int32
-	todos []todo
+	todos []ToDo
 }
 
 func defineFlagVariables() {
