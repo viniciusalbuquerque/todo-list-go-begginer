@@ -31,7 +31,11 @@ func defineFlagVariables() {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("TEEEEEST\n")
+	fmt.Printf("TEST\n")
+}
+
+func handleTODOList(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("LIST ALL TODOS")
 }
 
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +51,7 @@ func handleTODORem(w http.ResponseWriter, r *http.Request) {
 
 func startServer() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", handleRequest).Methods("GET")
+	router.HandleFunc("/todo/list", handleTODOList).Methods("GET")
 	router.HandleFunc("/todo/add", handleTODOAdd).Methods("POST")
 	router.HandleFunc("/todo/rem", handleTODORem).Methods("POST")
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", serverHost, serverPort), router)
