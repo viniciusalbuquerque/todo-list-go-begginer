@@ -52,7 +52,7 @@ func handleTODORem(w http.ResponseWriter, r *http.Request) {
 func startServer() {
 	router := mux.NewRouter()
 	router.HandleFunc("/todo/list", handleTODOList).Methods("GET")
-	router.HandleFunc("/todo/add", handleTODOAdd).Methods("POST")
+	router.HandleFunc("/todo/add", handleTODOAdd).Methods("PUT")
 	router.HandleFunc("/todo/rem", handleTODORem).Methods("POST")
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", serverHost, serverPort), router)
 	if err != nil {
