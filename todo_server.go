@@ -29,8 +29,8 @@ type TodoWrapper struct {
 }
 
 type TodoOperation struct {
-	IdTodoWrapper int32
-	IdTodo int32
+	IdTodoWrapper int32 `json:"todoWrapperId"`
+	IdTodo int32 `json:"todoId"`
 }
 
 func checkHTTPMethod(r *http.Request, method string) error {
@@ -62,6 +62,7 @@ func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ADD TODO\n")
 
+//TODO Create function to deal with the HTTP Method verification
 	err := checkHTTPMethod(r, PUT)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -69,7 +70,7 @@ func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
+//TODO Create function to deal with JSON
 	var jsonObj TodoOperation
 	err = json.NewDecoder(r.Body).Decode(&jsonObj)
 	if err != nil {
@@ -77,6 +78,9 @@ func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
 		return
 	}
+
+	fmt.Println(jsonObj.IdTodoWrapper)
+	fmt.Println(jsonObj.IdTodo)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
