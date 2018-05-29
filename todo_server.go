@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"fmt"
 	"net/http"
 	"flag"
@@ -18,9 +17,16 @@ const GET string = "GET"
 const POST string = "POST"
 const PUT string = "PUT"
 
+type Response struct {
+	Success bool `json:"success"`
+	Message string `json:"message"`
+	ResponseJson interface{} `json:"data"`
+}
+
 type ToDo struct {
-	id int32
-	activity string
+	Id int32 `json:"id"`
+	Title string `json:"title"`
+	Done bool `json:"done"`
 }
 
 type TodoWrapper struct {
@@ -30,7 +36,7 @@ type TodoWrapper struct {
 
 type TodoOperation struct {
 	IdTodoWrapper int32 `json:"todoWrapperId"`
-	IdTodo int32 `json:"todoId"`
+	Todo ToDo `json:"todo"`
 }
 
 func checkHTTPMethod(r *http.Request, method string) error {
@@ -47,6 +53,22 @@ func defineFlagVariables() {
 	flag.Parse()
 }
 
+func createResponseEncapsulation(success bool, message string, data interface{}) Response {
+	response := Response {
+		Success: success,
+		Message: message,
+		ResponseJson : data,
+	}
+	return response
+}
+
+func markTODOAsDone(todoOperation TodoOperation) {
+	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", 
+		todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, 
+		todoOperation.Todo.Id)
+
+}
+
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("TEST\n")
 }
@@ -61,9 +83,15 @@ func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
 
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ADD TODO\n")
+}
 
+func handleTODORem(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("REMOVE TODO\n")
+}
+
+func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 //TODO Create function to deal with the HTTP Method verification
-	err := checkHTTPMethod(r, PUT)
+	err := checkHTTPMethod(r, POST)
 	if err != nil {
 		fmt.Println("error:", err)
 		http.Error(w, err.Error(), 500)
@@ -79,36 +107,30 @@ func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(jsonObj.IdTodoWrapper)
-	fmt.Println(jsonObj.IdTodo)
+	markTODOAsDone(jsonObj)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	io.WriteString(w,`{"success": true,"message": "Atividade adicionada com sucesso."}`)
-}
+	response := createResponseEncapsulation(true, "Atividade adicionada com sucesso.", nil)
 
-func handleTODORem(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("REMOVE TODO\n")
-}
-
-/*func startServer() {
-	router := mux.NewRouter()
-	router.HandleFunc("/todo/list", handleTODOList).Methods("GET")
-	router.HandleFunc("/todo/list/:id", handleGetTODOSFromList).Methods("GET")
-	router.HandleFunc("/todo/add", handleTODOAdd).Methods("PUT")
-	router.HandleFunc("/todo/rem", handleTODORem).Methods("POST")
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", serverHost, serverPort), router)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
 	}
-}*/
+
+	w.Write(responseJson)
+}
 
 func startServer() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/todo/list", handleTODOList)
 	mux.HandleFunc("/todo/add", handleTODOAdd)
 	mux.HandleFunc("/todo/rem", handleTODORem)
+	mux.HandleFunc("/todo/mark/done", handleTODOMarkDone)
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", serverHost, serverPort), mux)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
