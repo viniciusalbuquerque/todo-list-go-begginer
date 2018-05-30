@@ -7,6 +7,7 @@ import (
 	"log"
 	"errors"
 	"encoding/json"
+	"todo_server/mydb"
 )
 
 var staticDirectory string
@@ -63,9 +64,7 @@ func createResponseEncapsulation(success bool, message string, data interface{})
 }
 
 func markTODOAsDone(todoOperation TodoOperation) {
-	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", 
-		todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, 
-		todoOperation.Todo.Id)
+	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
 
 }
 
@@ -137,7 +136,12 @@ func startServer() {
 	}
 }
 
+func startDB() {
+	mydb.OpenConnection()
+}
+
 func main() {
 	defineFlagVariables()
 	startServer()
+	startDB()
 }
