@@ -5,14 +5,17 @@ var db *sql.DB
 
 const (
 	dbName = "todoServerDB"
-	conn = ""
+	conn = "postgres"
 )
 
 func OpenConnection() {
-	dbT, err := sql.Open(conn, dbName)
-        if err != nil {
+	var err error
+	db, err = sql.Open(conn, dbName)
+    if err != nil {
 		panic(err)
 	}
 
-	db = dbT
+	if err = db.Ping(); err != nil {
+        panic(err)
+    }
 }

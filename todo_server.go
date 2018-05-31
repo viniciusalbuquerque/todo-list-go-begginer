@@ -8,6 +8,7 @@ import (
 	"errors"
 	"encoding/json"
 	"todo_server/mydb"
+	"todo_server/models"
 )
 
 var staticDirectory string
@@ -22,22 +23,6 @@ type Response struct {
 	Success bool `json:"success"`
 	Message string `json:"message"`
 	ResponseJson interface{} `json:"data"`
-}
-
-type ToDo struct {
-	Id int32 `json:"id"`
-	Title string `json:"title"`
-	Done bool `json:"done"`
-}
-
-type TodoWrapper struct {
-	id int32
-	todos []ToDo
-}
-
-type TodoOperation struct {
-	IdTodoWrapper int32 `json:"todoWrapperId"`
-	Todo ToDo `json:"todo"`
 }
 
 func checkHTTPMethod(r *http.Request, method string) error {
@@ -63,29 +48,34 @@ func createResponseEncapsulation(success bool, message string, data interface{})
 	return response
 }
 
-func markTODOAsDone(todoOperation TodoOperation) {
+func markTODOAsDone(todoOperation models.TodoOperation) {
 	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
-
+//TODO Alter Done value from a specific ToDo
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("TEST\n")
+//TODO Test request
 }
 
 func handleTODOList(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("LIST ALL TODOS")
+//TODO Load all ToDo Wrappers
 }
 
 func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("GET SPECIFIC TODO")
+//TODO Load todo tasks from a ToDo Wrapper
 }
 
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ADD TODO\n")
+//TODO ADD to DB	
 }
 
 func handleTODORem(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("REMOVE TODO\n")
+//TODO Delete from DB
 }
 
 func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +88,7 @@ func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 	}
 
 //TODO Create function to deal with JSON
-	var jsonObj TodoOperation
+	var jsonObj models.TodoOperation
 	err = json.NewDecoder(r.Body).Decode(&jsonObj)
 	if err != nil {
 		fmt.Println("error:", err)
