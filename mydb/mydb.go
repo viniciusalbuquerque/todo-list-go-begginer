@@ -1,7 +1,7 @@
 package mydb
 import "database/sql"
 
-var db *sql.DB
+var DB *sql.DB
 
 const (
 	dbName = "todoServerDB"
@@ -10,12 +10,12 @@ const (
 
 func OpenConnection() {
 	var err error
-	db, err = sql.Open(conn, dbName)
+	DB, err = sql.Open(conn, dbName)
     if err != nil {
 		panic(err)
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = DB.Ping(); err != nil {
         panic(err)
     }
 }

@@ -61,6 +61,15 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 func handleTODOList(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("LIST ALL TODOS")
 //TODO Load all ToDo Wrappers
+	todoWrappers, err := models.GetAllToDoWrappers()
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	if todoWrappers != nil {
+		
+	}
 }
 
 func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
