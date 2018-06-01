@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "b57fda0f-9ec5-494e-88f7-5355d51cedcf",
+		"name": "TODOList",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ADD",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "WrapperTodoId",
+						"value": "1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"todoWrapperId\" : 2,\n  \"todoId\" : 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5555/todo/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ADD WRAPPER",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "WrapperTodoId",
+						"value": "1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"todoWrapperId\" : 2,\n  \"todoId\" : 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5555/todo/wrapper/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"wrapper",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MARK DONE",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "WrapperTodoId",
+						"value": "1",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"todoWrapperId\" : 2,\n  \"todo\": {\n    \"id\":1,\n    \"title\": \"Atividade 1\",\n    \"done\":true\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5555/todo/mark/done",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"mark",
+						"done"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LIST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5555/todo/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LIST SPECIFIC",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5555/todo/list/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"list",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REMOVE",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5555/todo/rem",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5555",
+					"path": [
+						"todo",
+						"rem"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
