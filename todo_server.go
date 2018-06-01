@@ -51,6 +51,7 @@ func createResponseEncapsulation(success bool, message string, data interface{})
 func markTODOAsDone(todoOperation models.TodoOperation) {
 	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
 //TODO Alter Done value from a specific ToDo
+	// this function should be on models
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +71,48 @@ func handleTODOList(w http.ResponseWriter, r *http.Request) {
 	if todoWrappers != nil {
 		
 	}
+}
+
+func handleTODOWrapperADD(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("ADD TODO WRAPPER\n")
+//TODO ADD to DB
+	err := checkHTTPMethod(r, PUT)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var jsonObj models.TodoWrapper
+	err = json.NewDecoder(r.Body).Decode(&jsonObj)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+		return
+	}
+
+	err = models.InsertToDoWrapper(jsonObj)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO List was created successfully", nil)
+	} else {
+		response = createResponseEncapsulation(false, "Your TODO List was not created", nil)
+	}	
+
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	w.Write(responseJson)
+
 }
 
 func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +167,9 @@ func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 }
 
 func startServer() {
+	fmt.Printf("Starting server...")
 	mux := http.NewServeMux()
+	mux.HandleFunc("/todo/wrapper/add", handleTODOWrapperADD)
 	mux.HandleFunc("/todo/list", handleTODOList)
 	mux.HandleFunc("/todo/add", handleTODOAdd)
 	mux.HandleFunc("/todo/rem", handleTODORem)
@@ -136,11 +181,12 @@ func startServer() {
 }
 
 func startDB() {
+	fmt.Printf("Opening Connection to DB\n")
 	mydb.OpenConnection()
 }
 
 func main() {
 	defineFlagVariables()
-	startServer()
 	startDB()
+	startServer()
 }
