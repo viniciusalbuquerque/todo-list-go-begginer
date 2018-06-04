@@ -48,12 +48,6 @@ func createResponseEncapsulation(success bool, message string, data interface{})
 	return response
 }
 
-func markTODOAsDone(todoOperation models.TodoOperation) {
-	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
-//TODO Alter Done value from a specific ToDo
-	// this function should be on models
-}
-
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("TEST\n")
 //TODO Test request
@@ -148,7 +142,7 @@ func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	markTODOAsDone(jsonObj)
+	models.MarkTODOAsDone(jsonObj)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")

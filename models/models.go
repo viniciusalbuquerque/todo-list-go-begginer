@@ -1,6 +1,8 @@
 package models
 
-import ("todo_server/mydb")
+import (
+	"todo_server/mydb"
+	"fmt")
 
 type ToDo struct {
 	Id int32 `json:"id"`
@@ -62,4 +64,9 @@ func InsertToDoInTodoWrappers(todoOp TodoOperation) error {
 	}
 
     return err;
+}
+
+func MarkTODOAsDone(todoOperation TodoOperation) {
+	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
+//TODO Alter Done value from a specific ToDo
 }
