@@ -245,12 +245,17 @@ func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.MarkTODOAsDone(jsonObj)
+	err = models.MarkTODOAsDone(jsonObj)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	response := createResponseEncapsulation(true, "Atividade adicionada com sucesso.", nil)
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO was updated successfully", nil)
+	} else {
+		response = createResponseEncapsulation(false, "ToDo was not updated", nil)
+	}
 
 //TODO Create function to deal with the errors
 	responseJson, jsErr := json.Marshal(response)

@@ -156,7 +156,27 @@ func InsertToDoInTodoWrappers(todoOp TodoOperation) (*ToDo, error) {
     return todo, nil;
 }
 
-func MarkTODOAsDone(todoOperation TodoOperation) {
+func MarkTODOAsDone(todoOperation TodoOperation) error {
 	fmt.Printf("CHECK TODO %v AS %v. todoWrapperId: %d / todoId: %d.\n", todoOperation.Todo.Title, todoOperation.Todo.Done, todoOperation.IdTodoWrapper, todoOperation.Todo.Id)
 //TODO Alter Done value from a specific ToDo
+
+	db := mydb.DB
+
+	query := `UPDATE ` + TODO_TAB + ` SET done=$1 WHERE id=$2 AND todo_wrapper_id=$3`  
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		panic(err.Error())
+		return  err;
+	}	
+	defer stmt.Close()
+
+	_, err = stmt.Exec(todoOperation.Todo.Done, todoOperation.Todo.Id, todoOperation.IdTodoWrapper)
+
+	if err != nil {
+		panic(err.Error())
+		return  err;
+	}
+
+	return nil
 }
