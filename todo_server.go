@@ -19,6 +19,7 @@ var serverPort int
 const GET string = "GET"
 const POST string = "POST"
 const PUT string = "PUT"
+const DELETE string = "DELETE"
 
 type Response struct {
 	Success bool `json:"success"`
@@ -258,11 +259,53 @@ func handleTODOMarkDone(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseJson)
 }
 
+func handleTODOWrapperRemove(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("REMOVE TODO WRAPPER")
+	err := checkHTTPMethod(r, DELETE)
+
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	todoWrapperIdStr := r.URL.Query().Get("id")
+	todoWrapperId,err := strconv.ParseInt(todoWrapperIdStr, 10, 32)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	err = models.RemoveTodoWrapper(todoWrapperId)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO Wrapper was removed successfully", nil)
+	} else {
+		response = createResponseEncapsulation(false, "Unable to remove your TODO Wrapper", nil)
+	}	
+
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	w.Write(responseJson)
+}
+
 func startServer() {
 	fmt.Printf("Starting server...")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/todo/wrapper/add", handleTODOWrapperADD)
 	mux.HandleFunc("/todo/wrapper/list", handleTODOWrapperList)
+	mux.HandleFunc("/todo/wrapper/delete", handleTODOWrapperRemove)
 	mux.HandleFunc("/todo/list", handleTODOList)
 	mux.HandleFunc("/todo/add", handleTODOAdd)
 	mux.HandleFunc("/todo/rem", handleTODORem)

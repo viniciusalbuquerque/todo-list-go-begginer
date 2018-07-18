@@ -180,3 +180,27 @@ func MarkTODOAsDone(todoOperation TodoOperation) error {
 
 	return nil
 }
+
+func RemoveTodoWrapper(todoWrapperId int64) error {
+	fmt.Println("REMOVING TODO WRAPPER WITH ID = ", todoWrapperId)
+
+	db := mydb.DB
+
+	query := `DELETE FROM ` + TODO_WRAPPER_TAB + ` WHERE id=$1`
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		panic(err.Error())
+		return  err;
+	}	
+	defer stmt.Close()
+
+	_, err = stmt.Exec(todoWrapperId)
+
+	if err != nil {
+		panic(err.Error())
+		return  err;
+	}
+
+	return nil
+}
