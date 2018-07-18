@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"todo_server/mydb"
 	"todo_server/models"
+	"strconv"
 )
 
 var staticDirectory string
@@ -53,18 +54,84 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 //TODO Test request
 }
 
-func handleTODOList(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("LIST ALL TODOS")
+func handleTODOWrapperList(w http.ResponseWriter, r *http.Request) {
 //TODO Load all ToDo Wrappers
-	todoWrappers, err := models.GetAllToDoWrappers()
+	fmt.Printf("LIST ALL TODOS WRAPPERS")
+	err := checkHTTPMethod(r, GET)
 	if err != nil {
 		fmt.Println("error:", err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	if todoWrappers != nil {
-		
+
+	todoWrappers, err := models.GetAllToDoWrappers()
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO Wrapper List was returned successfully", todoWrappers)
+	} else {
+		response = createResponseEncapsulation(false, "Unable to get your list", nil)
+	}	
+
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
 	}
+
+	w.Write(responseJson)
+}
+
+func handleTODOList(w http.ResponseWriter, r *http.Request) {
+//TODO Load all ToDos
+	fmt.Printf("LIST ALL TODOS")
+	err := checkHTTPMethod(r, GET)
+
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	query := r.URL.Query().Get("id")
+	fmt.Println("QUERY:", query)
+
+
+	todoWrapperIdStr := r.URL.Query().Get("id")
+	todoWrapperId,err := strconv.ParseInt(todoWrapperIdStr, 10, 32)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	todos, err := models.GetAllToDosFromTodoWrapper(todoWrapperId)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO List was returned successfully", todos)
+	} else {
+		response = createResponseEncapsulation(false, "Unable to get your list", nil)
+	}	
+
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	w.Write(responseJson)
+
 }
 
 func handleTODOWrapperADD(w http.ResponseWriter, r *http.Request) {
@@ -85,14 +152,14 @@ func handleTODOWrapperADD(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.InsertToDoWrapper(jsonObj)
+	todoWrapper, err := models.InsertToDoWrapper(jsonObj)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
 	var response Response
 	if err == nil {
-		response = createResponseEncapsulation(true, "Your TODO List was created successfully", nil)
+		response = createResponseEncapsulation(true, "Your TODO List was created successfully", todoWrapper)
 	} else {
 		response = createResponseEncapsulation(false, "Your TODO List was not created", nil)
 	}	
@@ -117,6 +184,42 @@ func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ADD TODO\n")
 //TODO ADD to DB	
+	err := checkHTTPMethod(r, PUT)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var jsonObj models.TodoOperation
+	err = json.NewDecoder(r.Body).Decode(&jsonObj)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+		return
+	}
+
+	todoWrapper, err := models.InsertToDoInTodoWrappers(jsonObj)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var response Response
+	if err == nil {
+		response = createResponseEncapsulation(true, "Your TODO was created successfully", todoWrapper)
+	} else {
+		response = createResponseEncapsulation(false, "Your TODO was not created", nil)
+	}	
+
+//TODO Create function to deal with the errors
+	responseJson, jsErr := json.Marshal(response)
+	if jsErr != nil {
+		fmt.Println("error:", jsErr)
+		http.Error(w, "Unable to respond", http.StatusBadRequest)
+		return
+	}
+
+	w.Write(responseJson)
 }
 
 func handleTODORem(w http.ResponseWriter, r *http.Request) {
@@ -164,6 +267,7 @@ func startServer() {
 	fmt.Printf("Starting server...")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/todo/wrapper/add", handleTODOWrapperADD)
+	mux.HandleFunc("/todo/wrapper/list", handleTODOWrapperList)
 	mux.HandleFunc("/todo/list", handleTODOList)
 	mux.HandleFunc("/todo/add", handleTODOAdd)
 	mux.HandleFunc("/todo/rem", handleTODORem)
