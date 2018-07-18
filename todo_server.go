@@ -49,11 +49,6 @@ func createResponseEncapsulation(success bool, message string, data interface{})
 	return response
 }
 
-func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("TEST\n")
-//TODO Test request
-}
-
 func handleTODOWrapperList(w http.ResponseWriter, r *http.Request) {
 //TODO Load all ToDo Wrappers
 	fmt.Printf("LIST ALL TODOS WRAPPERS")
@@ -174,11 +169,6 @@ func handleTODOWrapperADD(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(responseJson)
 
-}
-
-func handleGetTODOSFromList(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("GET SPECIFIC TODO")
-//TODO Load todo tasks from a ToDo Wrapper
 }
 
 func handleTODOAdd(w http.ResponseWriter, r *http.Request) {
